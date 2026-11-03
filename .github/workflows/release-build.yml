@@ -2,11 +2,6 @@ name: Release Build
 
 on:
   workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version name (e.g., 1.0.0)'
-        required: false
-        default: ''
 
 jobs:
   release:
@@ -14,10 +9,10 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v4 # 改回官方稳定版
 
     - name: Set up JDK 21
-      uses: actions/setup-java@v5
+      uses: actions/setup-java@v4 # 改回官方稳定版
       with:
         java-version: '21'
         distribution: 'temurin'
@@ -26,13 +21,14 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
-    - name: Build Release APK
-      run: ./gradlew assembleRelease --no-configuration-cache --warning-mode all
+    # 核心修改：改成 assembleDebug，不需要签名
+    - name: Build Debug APK
+      run: ./gradlew assembleDebug --no-configuration-cache --warning-mode all
       env:
         GRADLE_OPTS: "-Dorg.gradle.daemon=false"
 
-    - name: Upload Release APK
-      uses: actions/upload-artifact@v7
+    - name: Upload Debug APK
+      uses: actions/upload-artifact@v4 # 改回官方稳定版
       with:
-        name: fluxhub-release
-        path: app/build/outputs/apk/release/*.apk
+        name: fluxhub-debug
+        path: app/build/outputs/apk/debug/*.apk # 路径改成 debug
